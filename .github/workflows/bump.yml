@@ -56,11 +56,14 @@ jobs:
           private-key: ${{ secrets.app-private-key }}
           owner: lcandy2
           repositories: homebrew-tap
+          permission-contents: write
       - uses: actions/checkout@v5
         with:
           repository: lcandy2/homebrew-tap
-          token: ${{ steps.app.outputs.token }}
+          persist-credentials: false
       - name: Point the formula at the download
+        env:
+          TOKEN: ${{ steps.app.outputs.token }}
         run: |
           file="Formula/$FORMULA.rb"
           test -f "$file" || { echo "No $file in the tap"; exit 1; }
@@ -71,4 +74,6 @@ jobs:
           git config user.name "$BOT_NAME"
           git config user.email "$BOT_EMAIL"
           git commit -am "$FORMULA: $(basename "$URL")"
-          git push
+          # The token reaches git for this push alone.
+          auth=$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" push
