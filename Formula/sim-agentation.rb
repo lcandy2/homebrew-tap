@@ -1,8 +1,8 @@
 class SimAgentation < Formula
   desc "Annotate a running iOS simulator in the browser and hand the notes to agents"
   homepage "https://github.com/lcandy2/sim-agentation"
-  url "https://github.com/lcandy2/sim-agentation/releases/download/0.2.0/sim-agentation-0.2.0-macos-arm64.tar.gz"
-  sha256 "3189c582a6335e247c04ce9588e8a2a648341a119ecf7c2cdd1ba4b810d18ead"
+  url "https://github.com/lcandy2/sim-agentation/releases/download/0.2.1/sim-agentation-0.2.1-macos-arm64.tar.gz"
+  sha256 "2bf5062550e9ca82c85d30b11beccd17afabab24284c193b2d6d03a15d5f1e52"
   license "Apache-2.0"
 
   depends_on arch: :arm64
