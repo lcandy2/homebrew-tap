@@ -3,7 +3,7 @@ class SimAgentation < Formula
   homepage "https://github.com/lcandy2/sim-agentation"
   url "https://github.com/lcandy2/sim-agentation/releases/download/0.2.0/sim-agentation-0.2.0-macos-arm64.tar.gz"
   sha256 "3189c582a6335e247c04ce9588e8a2a648341a119ecf7c2cdd1ba4b810d18ead"
-  license "MIT"
+  license "Apache-2.0"
 
   depends_on arch: :arm64
   depends_on macos: :sequoia
