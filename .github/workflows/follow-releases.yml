@@ -1,0 +1,43 @@
+name: Follow releases
+
+# The tap updates itself: sim-agentation's releases are public, so this
+# reads the latest one and points the formula at it with the tap's own
+# token. No credentials cross between the repositories.
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: follow-releases
+
+jobs:
+  sim-agentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Point the formula at the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORMULA: Formula/sim-agentation.rb
+        run: |
+          tag=$(gh release view --repo lcandy2/sim-agentation --json tagName -q .tagName)
+          echo "$tag" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo "unexpected tag: $tag"; exit 1; }
+          current=$(sed -n 's|^  url ".*/releases/download/\([^/]*\)/.*|\1|p' "$FORMULA")
+          if [ "$tag" = "$current" ]; then echo "Already at $tag"; exit 0; fi
+          asset="sim-agentation-$tag-macos-arm64.tar.gz"
+          gh release download "$tag" --repo lcandy2/sim-agentation --pattern "$asset" --dir "$RUNNER_TEMP"
+          sha=$(sha256sum "$RUNNER_TEMP/$asset" | cut -d' ' -f1)
+          sed -i -E \
+            -e "s|^  url \".*\"|  url \"https://github.com/lcandy2/sim-agentation/releases/download/$tag/$asset\"|" \
+            -e "s|^  sha256 \".*\"|  sha256 \"$sha\"|" \
+            "$FORMULA"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "sim-agentation $tag"
+          git push
+          echo "Updated from $current to $tag"
